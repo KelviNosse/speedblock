@@ -1,0 +1,13 @@
+servers: []
+
+messages:
+  prefix: "&8[&bSpeedBlock&8] &7"
+  not-whitelisted: "&cYou are not whitelisted on this server."
+  player-added: "&aPlayer %player% has been added to the whitelist for %server%."
+  player-removed: "&cPlayer %player% has been removed from the whitelist for %server%."
+  whitelist-cleared: "&cThe whitelist for %server% has been cleared."
+  whitelist-created: "&aWhitelist file for %server% has been created."
+  config-reloaded: "&aConfiguration reloaded."
+  player-not-found: "&cPlayer %player% not found."
+  server-not-found: "&cServer %server% not found in the configuration."
+  no-permission: "&cYou don't have permission to use this command."

@@ -1,0 +1,9 @@
+{
+  "id": "speedblock",
+  "name": "SpeedBlock",
+  "version": "1.0.0",
+  "description": "A whitelist plugin for backend servers in a Velocity network",
+  "authors": ["Puchidex"],
+  "main": "com.puchidex.speedblock.SpeedBlock",
+  "dependencies": []
+}

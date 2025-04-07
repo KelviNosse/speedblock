@@ -1,0 +1,40 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE Files
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+.vscode/
+*.code-workspace
+
+# Mac
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Runtime files
+run/
+!run/velocity.toml
+
+# Server/Test files
+server/
+test-server/
+
+# Local configs
+local.properties
+
+# Misc
+*.bak
+*.swp
+*.tmp
