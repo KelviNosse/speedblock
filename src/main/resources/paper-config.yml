@@ -10,9 +10,3 @@ known-servers:
 
 # Whether to enable debug logging
 debug: false
-
-# NPC integration settings (for future implementation)
-npc:
-  enabled: false
-  name: "&b[Whitelist Manager]"
-  id: -1  # Set to a valid NPC ID if using Citizens

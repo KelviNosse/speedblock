@@ -33,11 +33,4 @@ public class BridgeFactory {
         
         return instance;
     }
-    
-    public static PlatformBridge getBridge() {
-        if (instance == null) {
-            throw new IllegalStateException("Bridge not initialized. Call createBridge first.");
-        }
-        return instance;
-    }
 }

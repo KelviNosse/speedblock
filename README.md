@@ -12,7 +12,6 @@ SpeedBlock is a flexible whitelist management system that works on both Velocity
 - **Whitelist Management**: Create, manage, and enforce whitelists for backend servers
 - **Cross-Platform Communication**: Seamlessly communicate between Velocity and Paper servers
 - **Permission-Based Access**: Configure command access with permissions
-- **NPC Support**: (Optional) Integration with NPCs for whitelist management in-game
 
 ## Installation
 
