@@ -48,14 +48,11 @@ public class SpeedBlock {
         
         server.getEventManager().register(this, new ServerConnectListener(this));
         
-        // Register the command
         server.getCommandManager().register("speedblock", new SpeedBlockCommand(this));
         
-        // Register plugin messaging channels
         server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("speedblock:commands"));
         server.getChannelRegistrar().register(MinecraftChannelIdentifier.from("speedblock:responses"));
         
-        // Register the plugin messaging listener
         server.getEventManager().register(this, new PluginMessageListener(this));
         
         logger.info("SpeedBlock has been initialized!");

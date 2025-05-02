@@ -11,10 +11,24 @@ repositories {
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
 }
 
+configurations {
+    velocityImplementation.extendsFrom implementation
+    paperImplementation.extendsFrom implementation
+    
+    velocityCompileOnly.extendsFrom compileOnly
+    paperCompileOnly.extendsFrom compileOnly
+}
+
 dependencies {
+    // Common dependencies
+    implementation 'org.json:json:20230227'
+    
+    // Velocity API
     compileOnly 'com.velocitypowered:velocity-api:3.1.0'
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.0'
-    implementation 'org.json:json:20230227'
+    
+    // Paper API
+    compileOnly 'io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT'
 }
 
 java {
@@ -22,17 +36,73 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-shadowJar {
-    archiveBaseName.set('SpeedBlock')
+// Create two separate JARs
+task velocityJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveBaseName.set('SpeedBlock-Velocity')
     archiveClassifier.set('')
-    archiveVersion.set('')
+    
+    from(sourceSets.main.output) {
+        exclude 'plugin.yml' // Exclude Paper plugin.yml
+        exclude 'paper-config.yml'
+    }
+
+    configurations = [project.configurations.runtimeClasspath]
+    
+    dependencies {
+        include(dependency('org.json:json'))
+    }
+    
+    relocate 'org.json', 'com.puchidex.speedblock.libs.org.json'
 }
 
-tasks.build.dependsOn tasks.shadowJar
-
-task copyJarToServer(type: Copy, dependsOn: shadowJar) {
-    from("build/libs/SpeedBlock.jar")
-    into("run/plugins")
+task paperJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveBaseName.set('SpeedBlock-Paper')
+    archiveClassifier.set('')
+    
+    from(sourceSets.main.output) {
+        exclude 'velocity-plugin.json' // Exclude Velocity plugin descriptor
+    }
+    
+    configurations = [project.configurations.runtimeClasspath]
+    
+    dependencies {
+        include(dependency('org.json:json'))
+    }
+    
+    relocate 'org.json', 'com.puchidex.speedblock.libs.org.json'
 }
 
-tasks.build.finalizedBy(copyJarToServer)
+// Make the build task depend on both JAR tasks
+build.dependsOn velocityJar, paperJar
+
+// Fix the default jar task to avoid duplicates
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    enabled = false  // Disable the default jar task since we're using custom jars
+}
+
+// Task to copy JARs to server
+task copyVelocityJarToServer(type: Copy, dependsOn: velocityJar) {
+    from velocityJar.archiveFile
+    into "${project.rootDir}/run/plugins"
+    rename { String fileName ->
+        'SpeedBlock.jar'
+    }
+}
+
+task copyPaperJarToServer(type: Copy, dependsOn: paperJar) {
+    from paperJar.archiveFile
+    into "${project.rootDir}/run/paper/plugins"
+    rename { String fileName ->
+        'SpeedBlock.jar'
+    }
+}
+
+// Create install task to copy both JAR files
+task install(dependsOn: [copyVelocityJarToServer, copyPaperJarToServer]) {
+    group = 'build'
+    description = 'Builds and installs all plugin versions to the server directories'
+}
+
+// Add these tasks to the build task
+build.finalizedBy(install)

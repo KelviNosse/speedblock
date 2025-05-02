@@ -1,0 +1,18 @@
+# SpeedBlock Paper Plugin Configuration
+
+# List of known proxy servers to suggest in tab completion
+known-servers:
+  - survival
+  - creative
+  - skyblock
+  - minigames
+  - lobby
+
+# Whether to enable debug logging
+debug: false
+
+# NPC integration settings (for future implementation)
+npc:
+  enabled: false
+  name: "&b[Whitelist Manager]"
+  id: -1  # Set to a valid NPC ID if using Citizens

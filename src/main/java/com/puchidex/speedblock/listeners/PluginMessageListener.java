@@ -7,7 +7,9 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +33,6 @@ public class PluginMessageListener {
             return;
         }
         
-        // Only handle messages from backend servers
         if (!(event.getSource() instanceof ServerConnection)) {
             return;
         }
@@ -39,36 +40,50 @@ public class PluginMessageListener {
         ServerConnection connection = (ServerConnection) event.getSource();
         Player player = connection.getPlayer();
         
-        // Convert the message bytes to a command string
-        String command = new String(event.getData(), StandardCharsets.UTF_8);
-        plugin.getLogger().info("Received command from backend server: " + command);
-        
-        // Execute the command as if it was typed by the console
-        String[] commandArgs = command.split(" ");
-        
-        // Create CompletableFuture for the command result
-        CompletableFuture<String> resultFuture = new CompletableFuture<>();
-        
-        // Capture command output
-        resultFuture.thenAccept(result -> {
+        try {
+            DataInputStream in = new DataInputStream(new ByteArrayInputStream(event.getData()));
+            
+            int requestId;
+            String command;
+            
             try {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(stream);
-                out.writeUTF(result);
-                
-                // Send the response back to the player
-                player.getCurrentServer().ifPresent(server -> 
-                    server.sendPluginMessage(RESPONSE_CHANNEL, stream.toByteArray())
-                );
+                requestId = in.readInt();
+                command = in.readUTF();
             } catch (IOException e) {
-                plugin.getLogger().error("Failed to send response to backend server", e);
+                requestId = 0;
+                command = new String(event.getData(), StandardCharsets.UTF_8);
             }
-        });
+            
+            plugin.getLogger().info("Received command from backend server: " + command);
+            
+            String[] commandArgs = command.split(" ");
+            
+            CompletableFuture<String> resultFuture = new CompletableFuture<>();
+            
+            final int finalRequestId = requestId;
+            
+            resultFuture.thenAccept(result -> {
+                try {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(stream);
+                    
+                    out.writeInt(finalRequestId);
+                    out.writeUTF(result);
+                    
+                    player.getCurrentServer().ifPresent(server -> 
+                        server.sendPluginMessage(RESPONSE_CHANNEL, stream.toByteArray())
+                    );
+                } catch (IOException e) {
+                    plugin.getLogger().error("Failed to send response to backend server", e);
+                }
+            });
+            
+            executeCommand(commandArgs, resultFuture);
+            
+        } catch (Exception e) {
+            plugin.getLogger().error("Error processing plugin message", e);
+        }
         
-        // Process the command
-        executeCommand(commandArgs, resultFuture);
-        
-        // Prevent the message from being forwarded
         event.setResult(PluginMessageEvent.ForwardResult.handled());
     }
     
@@ -162,7 +177,6 @@ public class PluginMessageListener {
         Optional<Player> optionalPlayer = plugin.getServer().getPlayer(playerName);
         
         if (optionalPlayer.isEmpty()) {
-            // If player is not online, use a random UUID
             java.util.UUID uuid = java.util.UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes());
             if (plugin.getWhitelistManager().addPlayer(serverName, playerName, uuid)) {
                 resultBuilder.append(plugin.getConfigFactory().formatMessage("player-added", "player", playerName, "server", serverName));

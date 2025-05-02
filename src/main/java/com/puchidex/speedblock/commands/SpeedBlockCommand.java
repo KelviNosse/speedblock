@@ -110,7 +110,6 @@ public class SpeedBlockCommand implements SimpleCommand {
         Optional<Player> optionalPlayer = plugin.getServer().getPlayer(playerName);
         
         if (optionalPlayer.isEmpty()) {
-            // If player is not online, use a random UUID
             UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes());
             if (plugin.getWhitelistManager().addPlayer(serverName, playerName, uuid)) {
                 sendMessage(source, "player-added", "player", playerName, "server", serverName);

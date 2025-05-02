@@ -1,28 +1,35 @@
 # SpeedBlock
 
-A Velocity plugin that handles whitelists for backend servers in a proxied Minecraft network.
+A whitelist management plugin for Velocity proxy and Paper backend servers.
 
-## Features
+## Overview
 
-- Per-server whitelist management
-- Simple command-based interface
-- Fully customizable messages
-- Lightweight and efficient design
+SpeedBlock is a flexible whitelist management system that works on both Velocity proxies and Paper backend servers. It allows server administrators to control which players can access specific backend servers in a Velocity proxy network.
+
+### Key Features
+
+- **Platform Detection**: Automatically detects whether it's running on Velocity or Paper
+- **Whitelist Management**: Create, manage, and enforce whitelists for backend servers
+- **Cross-Platform Communication**: Seamlessly communicate between Velocity and Paper servers
+- **Permission-Based Access**: Configure command access with permissions
+- **NPC Support**: (Optional) Integration with NPCs for whitelist management in-game
 
 ## Installation
 
-1. Download the latest release from the releases page
-2. Place the JAR file in your Velocity server's `plugins` directory
-3. Start or restart your Velocity server
-4. Edit the configuration file in `plugins/speedblock/config.yml` as needed
+1. Download the SpeedBlock.jar file
+2. Place it in both your Velocity proxy's `/plugins` folder and your Paper servers' `/plugins` folders
+3. Start or restart your servers
 
 ## Configuration
 
+### Velocity Configuration (config.yml)
+
 ```yaml
 servers:
-  - lobby
   - survival
   - creative
+  - skyblock
+  - minigames
 
 messages:
   prefix: "&8[&bSpeedBlock&8] &7"
@@ -37,20 +44,39 @@ messages:
   no-permission: "&cYou don't have permission to use this command."
 ```
 
+### Paper Configuration (paper-config.yml)
+
+```yaml
+# List of known proxy servers to suggest in tab completion
+known-servers:
+  - survival
+  - creative
+  - skyblock
+  - minigames
+  - lobby
+
+# Whether to enable debug logging
+debug: false
+```
+
 ## Commands
 
-- `/speedblock create <backendServerName>` - Creates the whitelist JSON file for the specified backend server
-- `/speedblock <backendServerName> add <playerName>` - Adds a player to the backend server whitelist
-- `/speedblock <backendServerName> remove <playerName>` - Removes a player from the backend server whitelist
-- `/speedblock <backendServerName> clear` - Clears all players and resets the backend server whitelist
-- `/speedblock reload` - Reloads the plugin configuration file
+### From Velocity Proxy or Any Backend Server with the Plugin
+
+- `/speedblock create <serverName>` - Creates a whitelist for a backend server
+- `/speedblock <serverName> add <playerName>` - Adds a player to a server's whitelist
+- `/speedblock <serverName> remove <playerName>` - Removes a player from a server's whitelist
+- `/speedblock <serverName> clear` - Clears a server's whitelist
+- `/speedblock reload` - Reloads the plugin configuration
 
 ## Permissions
 
-- `speedblock.admin` - Allows use of all plugin commands
+- `speedblock.admin` - Allows access to all SpeedBlock commands
 
-## Building from Source
+## License
 
-1. Clone the repository
-2. Run `./gradlew build` or `./gradlew shadowJar`
-3. The compiled JAR will be in the `build/libs` directory
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For help and support, please create an issue on our GitHub repository.
